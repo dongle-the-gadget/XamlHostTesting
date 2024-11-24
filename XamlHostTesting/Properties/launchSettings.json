@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "XamlHostTesting": {
+      "commandName": "MsixPackage"
+    }
+  }
+}
