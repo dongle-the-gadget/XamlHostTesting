@@ -7,8 +7,6 @@
 
 #include "winrt/XamlHostTesting2.h"
 
-#include "App.g.h"
-
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 
@@ -45,25 +43,3 @@ HWND coreWindowHwnd = nullptr;
 Windows::UI::Xaml::FrameworkView frameworkView = nullptr;
 
 Windows::UI::Xaml::Application app = nullptr;
-
-namespace winrt::XamlHostTesting2::implementation
-{
-    struct App : AppT<App>
-    {
-        App();
-
-		Windows::UI::Xaml::Markup::IXamlType GetXamlType(winrt::hstring const& fullName);
-        Windows::UI::Xaml::Markup::IXamlType GetXamlType(Windows::UI::Xaml::Interop::TypeName const& type);
-        winrt::com_array<Windows::UI::Xaml::Markup::XmlnsDefinition> GetXmlnsDefinitions();
-
-    private:
-        Windows::Foundation::Collections::IVector<Windows::UI::Xaml::Markup::IXamlMetadataProvider> m_providers = winrt::single_threaded_vector<Windows::UI::Xaml::Markup::IXamlMetadataProvider>();
-    };
-}
-
-namespace winrt::XamlHostTesting2::factory_implementation
-{
-	struct App : AppT<App, implementation::App>
-	{
-	};
-}

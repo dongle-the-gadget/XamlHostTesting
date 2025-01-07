@@ -1,11 +1,5 @@
 namespace XamlHostTesting2
 {
-    [default_interface]
-    runtimeclass App : Windows.UI.Xaml.Application, Windows.UI.Xaml.Markup.IXamlMetadataProvider
-    {
-        App();
-    }
-
     [uuid("6090202d-2843-4ba5-9b0d-fc88eecd9ce5")]
     interface ICoreApplicationPrivate2
     {

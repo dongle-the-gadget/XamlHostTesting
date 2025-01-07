@@ -40,7 +40,7 @@ static unsafe class Program
                 cbSize = (uint)sizeof(WNDCLASSEXW),
                 hInstance = hInstance,
                 lpfnWndProc = &WndProc,
-                lpszClassName = lpClassName
+                lpszClassName = lpClassName,
             };
 
             if (RegisterClassEx(&wc) == 0)
@@ -67,6 +67,23 @@ static unsafe class Program
         {
             return;
         }
+
+        SWCA.ACCENTPOLICY accent = new()
+        {
+            accentFlags = 0,
+            accentState = SWCA.AccentState.ACCENT_ENABLE_HOSTBACKDROP,
+            gradientColor = 0,
+            animationId = 0
+        };
+
+        SWCA.WINCOMPATTRDATA data = new()
+        {
+            attribute = SWCA.WindowCompositionAttribute.WCA_ACCENT_POLICY,
+            pData = &accent,
+            cbSize = (uint)sizeof(SWCA.ACCENTPOLICY)
+        };
+
+        SWCA.SetWindowCompositionAttribute(hWnd, &data);
 
         ShowWindow(hWnd, SHOW_WINDOW_CMD.SW_SHOWNORMAL);
         UpdateWindow(hWnd);

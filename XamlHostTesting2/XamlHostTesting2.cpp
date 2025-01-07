@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include "XamlHostTesting2.h"
-#include "App.g.cpp"
+#include <swca.h>
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -76,6 +76,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
+   HMODULE user32 = GetModuleHandle(L"user32.dll");
+   pfnSetWindowCompositionAttribute setWindowCompositionAttribute = (pfnSetWindowCompositionAttribute)GetProcAddress(user32, "SetWindowCompositionAttribute");
+   if (setWindowCompositionAttribute)
+   {
+       ACCENT_POLICY accent = { ACCENT_ENABLE_HOSTBACKDROP, 0, 0, 0 };
+       WINDOWCOMPOSITIONATTRIBDATA data = { WCA_ACCENT_POLICY, &accent, sizeof(accent) };
+       setWindowCompositionAttribute(hWnd, &data);
+   }
+
    return TRUE;
 }
 
@@ -111,16 +120,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         SetWindowLongPtr(coreWindowHwnd, GWL_STYLE, WS_CHILD | WS_VISIBLE);
         SetWindowPos(coreWindowHwnd, nullptr, 0, 0, pCreateStruct->cx, pCreateStruct->cy, SWP_SHOWWINDOW);
 
-        Windows::UI::Xaml::Controls::Button button;
-		button.Content(winrt::box_value(L"Hello, World!"));
-		button.HorizontalAlignment(Windows::UI::Xaml::HorizontalAlignment::Center);
-		button.VerticalAlignment(Windows::UI::Xaml::VerticalAlignment::Center);
-
-        Windows::UI::Xaml::Controls::Page page;
-		page.Content(button);
-
+        auto page = XamlHostTesting2::MainPage();
         Windows::UI::Xaml::Window::Current().Content(page);
-		Microsoft::UI::Xaml::Controls::BackdropMaterial::SetApplyToRootOrPageBackground(page, true);
         break;
     }
     case WM_SIZE:
@@ -150,52 +151,4 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
-}
-
-namespace winrt::XamlHostTesting2::implementation
-{
-    App::App()
-    {
-        m_providers.Append(Microsoft::UI::Xaml::XamlTypeInfo::XamlControlsXamlMetaDataProvider());
-    }
-
-    Windows::UI::Xaml::Markup::IXamlType App::GetXamlType(winrt::hstring const& fullName)
-    {
-        for (const auto& provider : m_providers)
-        {
-            const auto type = provider.GetXamlType(fullName);
-            if (type)
-            {
-                return type;
-            }
-        }
-        return nullptr;
-    }
-
-	Windows::UI::Xaml::Markup::IXamlType App::GetXamlType(Windows::UI::Xaml::Interop::TypeName const& type)
-	{
-		for (const auto& provider : m_providers)
-		{
-			const auto xamlType = provider.GetXamlType(type);
-			if (xamlType)
-			{
-				return xamlType;
-			}
-		}
-		return nullptr;
-	}
-
-	winrt::com_array<Windows::UI::Xaml::Markup::XmlnsDefinition> App::GetXmlnsDefinitions()
-	{
-		std::list<Windows::UI::Xaml::Markup::XmlnsDefinition> definitions;
-		for (const auto& provider : m_providers)
-		{
-			const auto xmlnsDefinitions = provider.GetXmlnsDefinitions();
-			for (const auto& definition : xmlnsDefinitions)
-			{
-				definitions.insert(definitions.begin(), definition);
-			}
-		}
-		return winrt::com_array<Windows::UI::Xaml::Markup::XmlnsDefinition>(definitions.begin(), definitions.end());
-	}
 }
